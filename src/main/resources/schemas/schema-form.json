@@ -1,0 +1,43 @@
+{
+  "type" : "object",
+  "id" : "urn:xsdschema:io:gravitee:policy:http:xsd:configuration:XsdValidatorPolicyConfiguration",
+  "properties" : {
+    "errorMessage": {
+      "title": "Http error message",
+      "description": "Http error message to send when request is not valid. Status code is 400 as Bad request.",
+      "type": "string",
+      "x-schema-form": {
+        "type": "codemirror",
+        "codemirrorOptions": {
+          "placeholder": "Put your error message here or drag'n'drop it",
+          "lineWrapping": true,
+          "lineNumbers": true,
+          "allowDropFileTypes": true,
+          "autoCloseTags": true,
+          "mode": "xml",
+          "value": "validation/internal"
+        }
+      }
+    },
+    "xsdSchema": {
+      "title": "xsdSchema",
+      "description": "XsdSchema used for request payload validation",
+      "type": "string",
+      "x-schema-form": {
+        "type": "codemirror",
+        "codemirrorOptions": {
+          "placeholder": "Put your xsd schema here or drag'n'drop it",
+          "lineWrapping": true,
+          "lineNumbers": true,
+          "allowDropFileTypes": true,
+          "autoCloseTags": true,
+          "mode": "xml"
+        }
+      }
+    },
+    "required": [
+      "xsdSchema",
+      "errorMessage"
+    ]
+  }
+}
