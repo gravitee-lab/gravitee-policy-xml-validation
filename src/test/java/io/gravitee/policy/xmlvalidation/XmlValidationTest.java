@@ -13,34 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.gravitee.policy.http.xsd;
+package io.gravitee.policy.xmlvalidation;
 
 import io.gravitee.common.http.HttpStatusCode;
 import io.gravitee.common.util.ServiceLoaderHelper;
+import io.gravitee.el.TemplateEngine;
 import io.gravitee.gateway.api.ExecutionContext;
 import io.gravitee.gateway.api.Request;
 import io.gravitee.gateway.api.Response;
 import io.gravitee.gateway.api.buffer.Buffer;
 import io.gravitee.gateway.api.buffer.BufferFactory;
 import io.gravitee.gateway.api.stream.ReadWriteStream;
-import io.gravitee.gateway.el.SpelTemplateEngine;
 import io.gravitee.policy.api.PolicyChain;
 import io.gravitee.policy.api.PolicyResult;
-import io.gravitee.policy.http.xsd.configuration.XsdValidatorPolicyConfiguration;
+import io.gravitee.policy.xmlvalidation.configuration.XmlValidationPolicyConfiguration;
 import io.gravitee.reporter.api.http.Metrics;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class XsdSchemaValidatorTest {
+public class XmlValidationTest {
 
     @Mock
     private Request mockRequest;
@@ -55,7 +55,7 @@ public class XsdSchemaValidatorTest {
     private PolicyChain mockPolicychain;
 
     @Mock
-    private XsdValidatorPolicyConfiguration configuration;
+    private XmlValidationPolicyConfiguration configuration;
 
     private BufferFactory factory = ServiceLoaderHelper.loadFactory(BufferFactory.class);
 
@@ -111,7 +111,7 @@ public class XsdSchemaValidatorTest {
 
     private Metrics metrics;
 
-    private XsdValidatorPolicy policy;
+    private XmlValidationPolicy policy;
 
     @Before
     public void beforeAll() {
@@ -124,9 +124,9 @@ public class XsdSchemaValidatorTest {
                 "  </error>");
         when(configuration.getXsdSchema()).thenReturn(xsdSchema);
         when(mockRequest.metrics()).thenReturn(metrics);
-        when(mockExecutionContext.getTemplateEngine()).thenReturn(new SpelTemplateEngine());
+        when(mockExecutionContext.getTemplateEngine()).thenReturn(TemplateEngine.templateEngine());
 
-        policy = new XsdValidatorPolicy(configuration);
+        policy = new XmlValidationPolicy(configuration);
     }
 
     @Test
@@ -134,7 +134,7 @@ public class XsdSchemaValidatorTest {
         ReadWriteStream readWriteStream = policy.onRequestContent(mockRequest, mockResponse, mockExecutionContext, mockPolicychain);
         readWriteStream.write(validXmlContent);
         readWriteStream.end();
-        verify(mockPolicychain, times(0)).streamFailWith(isA(PolicyResult.class));
+        verify(mockPolicychain, times(0)).streamFailWith(ArgumentMatchers.isA(PolicyResult.class));
     }
 
     @Test
@@ -173,7 +173,6 @@ public class XsdSchemaValidatorTest {
         verify(mockPolicychain, times(1)).streamFailWith(policyResult.capture());
         PolicyResult value = policyResult.getValue();
         assertThat(value.message()).isEqualTo(configuration.getErrorMessage());
-        assertThat(value.isFailure()).isTrue();
-        assertThat(value.httpStatusCode() == HttpStatusCode.BAD_REQUEST_400);
+        assertThat(value.statusCode() == HttpStatusCode.BAD_REQUEST_400);
     }
 }

@@ -13,29 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.gravitee.policy.http.xsd.configuration;
+package io.gravitee.policy.xmlvalidation.swagger;
 
-import io.gravitee.policy.api.PolicyConfiguration;
+import io.gravitee.policy.api.swagger.Policy;
+import io.gravitee.policy.api.swagger.v2.SwaggerOperationVisitor;
+import io.swagger.models.Operation;
+import io.swagger.models.Swagger;
 
-public class XsdValidatorPolicyConfiguration implements PolicyConfiguration {
+import java.util.Optional;
 
-    private String errorMessage;
-
-    private String xsdSchema;
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
-    }
-
-    public String getXsdSchema() {
-        return xsdSchema;
-    }
-
-    public void setXsdSchema(String xsdSchema) {
-        this.xsdSchema = xsdSchema;
+/**
+ * @author Florent CHAMFROY (florent.chamfroy at graviteesource.com)
+ * @author GraviteeSource Team
+ */
+public class XmlValidationSwaggerOperationVisitor implements SwaggerOperationVisitor {
+    @Override
+    public Optional<Policy> visit(Swagger swagger, Operation o) {
+        return Optional.empty();
     }
 }

@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.gravitee.policy.http.xsd;
+package io.gravitee.policy.xmlvalidation;
 
 import io.gravitee.common.http.HttpStatusCode;
+import io.gravitee.common.http.MediaType;
 import io.gravitee.gateway.api.ExecutionContext;
 import io.gravitee.gateway.api.Request;
 import io.gravitee.gateway.api.Response;
@@ -26,7 +27,7 @@ import io.gravitee.gateway.api.stream.SimpleReadWriteStream;
 import io.gravitee.policy.api.PolicyChain;
 import io.gravitee.policy.api.PolicyResult;
 import io.gravitee.policy.api.annotations.OnRequestContent;
-import io.gravitee.policy.http.xsd.configuration.XsdValidatorPolicyConfiguration;
+import io.gravitee.policy.xmlvalidation.configuration.XmlValidationPolicyConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -41,21 +42,22 @@ import java.io.IOException;
 import java.io.StringReader;
 
 
-public class XsdValidatorPolicy {
+public class XmlValidationPolicy {
 
-    private final static Logger logger = LoggerFactory.getLogger(XsdValidatorPolicy.class);
+    private final static Logger logger = LoggerFactory.getLogger(XmlValidationPolicy.class);
 
-    public static final String CONTENT_TYPE = "application/xml";
+    private final static String BAD_REQUEST = "Bad Request";
+    private final static String INTERNAL_ERROR = "Internal Error";
 
-    private XsdValidatorPolicyConfiguration configuration;
+    private XmlValidationPolicyConfiguration configuration;
 
-    public XsdValidatorPolicy(XsdValidatorPolicyConfiguration jsonSchemaValidatorPolicyConfiguration) {
+    public XmlValidationPolicy(XmlValidationPolicyConfiguration jsonSchemaValidatorPolicyConfiguration) {
         this.configuration = jsonSchemaValidatorPolicyConfiguration;
     }
 
     @OnRequestContent
     public ReadWriteStream onRequestContent(Request request, Response response, ExecutionContext executionContext, PolicyChain policyChain) {
-        logger.debug("Execute XSD schema validation policy on request {}", request.id());
+        logger.debug("Execute XML validation policy on request {}", request.id());
         return new BufferedReadWriteStream() {
 
             Buffer buffer = Buffer.buffer();
@@ -80,11 +82,19 @@ public class XsdValidatorPolicy {
                     super.end();
                 } catch (SAXException | IOException e) {
                     request.metrics().setMessage(e.getMessage());
-                    String errorMessage = executionContext.getTemplateEngine().convert(configuration.getErrorMessage());
-                    policyChain.streamFailWith(PolicyResult.failure(HttpStatusCode.BAD_REQUEST_400, errorMessage, CONTENT_TYPE));
+                    sendErrorResponse(executionContext, policyChain, HttpStatusCode.BAD_REQUEST_400);
                 }
             }
         };
     }
 
+    private void sendErrorResponse(ExecutionContext executionContext, PolicyChain policyChain, int httpStatusCode) {
+        String errorMessage = null;
+        if (configuration.getErrorMessage() != null && !configuration.getErrorMessage().isEmpty()) {
+            errorMessage = executionContext.getTemplateEngine().convert(configuration.getErrorMessage());
+        } else {
+            errorMessage = httpStatusCode == 400 ? BAD_REQUEST : INTERNAL_ERROR;
+        }
+        policyChain.streamFailWith(PolicyResult.failure(httpStatusCode, errorMessage, MediaType.APPLICATION_XML));
+    }
 }
