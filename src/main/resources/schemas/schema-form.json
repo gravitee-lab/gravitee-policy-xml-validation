@@ -1,6 +1,6 @@
 {
   "type" : "object",
-  "id" : "urn:xsdschema:io:gravitee:policy:http:xsd:configuration:XsdValidatorPolicyConfiguration",
+  "id" : "urn:xmlschema:io:gravitee:policy:XmlValidationPolicyConfiguration",
   "properties" : {
     "errorMessage": {
       "title": "Http error message",
@@ -21,12 +21,12 @@
     },
     "xsdSchema": {
       "title": "xsdSchema",
-      "description": "XsdSchema used for request payload validation",
+      "description": "XML schema used for request payload validation",
       "type": "string",
       "x-schema-form": {
         "type": "codemirror",
         "codemirrorOptions": {
-          "placeholder": "Put your xsd schema here or drag'n'drop it",
+          "placeholder": "Put your xml schema here or drag'n'drop it",
           "lineWrapping": true,
           "lineNumbers": true,
           "allowDropFileTypes": true,
@@ -34,10 +34,9 @@
           "mode": "xml"
         }
       }
-    },
-    "required": [
-      "xsdSchema",
-      "errorMessage"
-    ]
-  }
+    }
+  },
+  "required": [
+    "xsdSchema"
+  ]
 }

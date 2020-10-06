@@ -1,7 +1,7 @@
-= XSD Schema Policy
+= XML Validation Policy
 
 ifdef::env-github[]
-image:https://ci.gravitee.io/buildStatus/icon?job=gravitee-io/gravitee-policy-jsonschema/master["Build status", link="https://ci.gravitee.io/job/gravitee-io/job/gravitee-policy-jsonschema/"]
+image:https://ci.gravitee.io/buildStatus/icon?job=gravitee-io/gravitee-policy-xml-validation/master["Build status", link="https://ci.gravitee.io/job/gravitee-io/job/gravitee-policy-xml-validation/"]
 image:https://badges.gitter.im/Join Chat.svg["Gitter", link="https://gitter.im/gravitee-io/gravitee-io?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"]
 endif::[]
 
@@ -19,8 +19,8 @@ endif::[]
 
 == Description
 
-The XSD Schema policy allows XML validation. This policy uses javax.xml.
-Return Error 400 BAD REQUEST when validation failed with with custom error message body.
+The XML Validation policy allows XML validation using XSD schema. This policy uses javax.xml.
+Return Error 400 BAD REQUEST when validation failed with custom error message body.
 Inject processing report messages into request metrics for analytics.
 
 
@@ -30,7 +30,7 @@ Inject processing report messages into request metrics for analytics.
 |Property |Required |Description |Type| Default
 
 .^|errorMessage
-^.^|X
+^.^|
 |Custom error message in XML format. Spel is allowed.
 ^.^|string
 |validation/internal
@@ -54,7 +54,7 @@ Inject processing report messages into request metrics for analytics.
 
 * Invalid payload
 
-* Invalid xsdschema
+* Invalid XSD schema
 
 * Invalid error message XML format
 
